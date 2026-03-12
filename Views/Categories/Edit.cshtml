@@ -1,0 +1,47 @@
+@model ButikStok.Models.Category
+
+@{
+    ViewData["Title"] = "Kategoriyi Düzenle";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 text-center">
+                    <div class="bg-warning bg-opacity-10 p-3 d-inline-block rounded-circle text-warning mb-2">
+                        <i class="bi bi-pencil-square display-6"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Kategoriyi Düzenle</h3>
+                    <p class="text-muted small">İsim değişikliği yapıyorsun.</p>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="form-floating mb-4">
+                            <input asp-for="Name" class="form-control" placeholder="Kategori Adı" />
+                            <label asp-for="Name" class="text-secondary">Kategori Adı</label>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning text-white btn-lg shadow-sm">
+                                <i class="bi bi-save"></i> Değişiklikleri Kaydet
+                            </button>
+                            <a asp-action="Index" class="btn btn-light text-secondary">
+                                <i class="bi bi-x-lg"></i> Vazgeç
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

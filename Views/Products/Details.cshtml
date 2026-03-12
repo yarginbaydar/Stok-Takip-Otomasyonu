@@ -1,0 +1,86 @@
+@model ButikStok.Models.Product
+
+@{
+    ViewData["Title"] = "Ürün Kimlik Kartı";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            
+            <div id="urunKarti" class="card shadow-lg border-0">
+                <div class="card-header bg-dark text-white text-center py-3">
+                    <h5 class="mb-0 fw-bold" style="letter-spacing: 1px;">ÜRÜN KİMLİK KARTI</h5>
+                </div>
+                
+                <div class="card-body p-4 text-center bg-white">
+                    
+                    <div class="mb-4 d-flex justify-content-center">
+                        @if (ViewBag.QrCode != null)
+                        {
+                            <img src="data:image/png;base64,@ViewBag.QrCode" 
+                                 class="img-fluid border p-2 bg-white shadow-sm" 
+                                 style="width: 220px; height: 220px;" 
+                                 alt="Ürün Karekodu" />
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning py-4 px-5">
+                                <i class="bi bi-exclamation-circle fs-1"></i><br>
+                                Karekod Oluşturulamadı
+                            </div>
+                        }
+                    </div>
+
+                    <h2 class="fw-bold text-uppercase text-dark mb-1">@Model.Name</h2>
+                    <span class="badge bg-secondary mb-3">@Model.Category?.Name</span>
+                    
+                    <hr class="my-4" />
+
+                    <div class="row">
+                        <div class="col-6 border-end">
+                            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Stok Kodu</small>
+                            <span class="fw-bold fs-4 font-monospace">#@Model.Id.ToString("D4")</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Satış Fiyatı</small>
+                            <h3 class="fw-bold text-success mb-0">@Model.Price.ToString("C2")</h3>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-light text-center py-2">
+                    <small class="text-muted fw-bold">BUTİK STOK SİSTEMİ</small>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2 d-print-none">
+                <button onclick="window.print()" class="btn btn-dark btn-lg flex-grow-1 shadow-sm">
+                    <i class="bi bi-printer-fill me-2"></i> YAZDIR
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-lg flex-grow-1 shadow-sm">
+                    <i class="bi bi-arrow-left me-2"></i> Listeye Dön
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Yazdırma Modu: Sadece kartı göster, butonları ve menüleri gizle */
+    @@media print {
+        body * { visibility: hidden; }
+        #urunKarti, #urunKarti * { visibility: visible; }
+        #urunKarti { 
+            position: absolute; 
+            left: 50%; 
+            top: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 100%; 
+            border: 2px solid #000; 
+            box-shadow: none !important;
+        }
+        .d-print-none { display: none !important; }
+    }
+</style>

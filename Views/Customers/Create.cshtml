@@ -1,0 +1,48 @@
+@model ButikStok.Models.Customer
+
+@{
+    ViewData["Title"] = "Yeni Müşteri";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-header bg-primary text-white py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-person-plus-fill me-2"></i>Yeni Müşteri Kartı</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create">
+                        <div class="form-floating mb-3">
+                            <input asp-for="Name" class="form-control" placeholder="Ad Soyad" />
+                            <label asp-for="Name">Ad Soyad / Unvan</label>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="Telefon" />
+                            <label asp-for="PhoneNumber">Telefon Numarası</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Email" class="form-control" placeholder="E-Posta" />
+                            <label asp-for="Email">E-Posta (İsteğe bağlı)</label>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <textarea asp-for="Notes" class="form-control" style="height: 100px" placeholder="Notlar"></textarea>
+                            <label asp-for="Notes">Müşteri Notları (Beden, tercihler vb.)</label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                                <i class="bi bi-save me-2"></i>KAYDET
+                            </button>
+                            <a asp-action="Index" class="btn btn-light rounded-pill">Vazgeç</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

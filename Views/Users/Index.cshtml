@@ -1,0 +1,40 @@
+@model IEnumerable<ButikStok.Models.User>
+
+@{ ViewData["Title"] = "Kullanıcılar"; }
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3><i class="bi bi-people-fill"></i> Personel Yönetimi</h3>
+        <a asp-action="Create" class="btn btn-primary"><i class="bi bi-person-plus-fill"></i> Yeni Kullanıcı Ekle</a>
+    </div>
+
+    @if (TempData["Hata"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Hata"]</div>
+    }
+
+    <div class="card shadow-sm">
+        <table class="table table-hover mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th>Kullanıcı Adı</th>
+                    <th>Şifre</th>
+                    <th class="text-end">İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@item.Username</td>
+                        <td class="text-muted">******</td> <td class="text-end">
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger" onclick="return confirm('Bu kullanıcıyı silmek istediğine emin misin?');">
+                                <i class="bi bi-trash"></i> Sil
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,107 @@
+@model ButikStok.Models.Customer
+
+@{
+    ViewData["Title"] = "Müşteri Dosyası";
+    // Toplam kaç adet ürün almış?
+    int toplamUrun = Model.Transactions?.Where(x => x.Type == "Satis").Sum(x => x.Quantity) ?? 0;
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-lg rounded-4 text-center overflow-hidden">
+                <div class="card-header bg-primary text-white py-4">
+                    <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow" 
+                         style="width: 80px; height: 80px; font-size: 32px; font-weight: bold;">
+                        @Model.Name.Substring(0,1).ToUpper()
+                    </div>
+                    <h4 class="mb-0 fw-bold">@Model.Name</h4>
+                    <small class="opacity-75">Kayıt: @Model.RegisterDate.ToString("dd.MM.yyyy")</small>
+                </div>
+                <div class="card-body p-4 text-start">
+                    <div class="mb-3">
+                        <label class="text-muted small fw-bold">TELEFON</label>
+                        <div class="fs-5">
+                            @if(!string.IsNullOrEmpty(Model.PhoneNumber)) {
+                                <a href="tel:@Model.PhoneNumber" class="text-decoration-none text-dark">
+                                    <i class="bi bi-telephone-fill text-success me-2"></i>@Model.PhoneNumber
+                                </a>
+                            } else { <span class="text-muted">-</span> }
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small fw-bold">BAKİYE DURUMU</label>
+                        <div class="fs-4 fw-bold @(Model.DebtBalance > 0 ? "text-danger" : "text-success")">
+                            @Model.DebtBalance.ToString("C2")
+                        </div>
+                    </div>
+                    <div class="alert alert-light border small">
+                        <strong><i class="bi bi-sticky"></i> Notlar:</strong><br>
+                        @(string.IsNullOrEmpty(Model.Notes) ? "Not yok." : Model.Notes)
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">
+                            <i class="bi bi-arrow-left"></i> Listeye Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card border-0 shadow rounded-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-bag-check-fill text-warning me-2"></i>Alışveriş Geçmişi</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-secondary small">
+                            <tr>
+                                <th class="ps-4">TARİH</th>
+                                <th>ÜRÜN</th>
+                                <th class="text-center">ADET</th>
+                                <th class="text-end pe-4">TUTAR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Transactions != null && Model.Transactions.Any())
+                            {
+                                @foreach (var item in Model.Transactions.OrderByDescending(x => x.Date))
+                                {
+                                    <tr>
+                                        <td class="ps-4">@item.Date.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>
+                                            @if(item.Product != null) {
+                                                <span class="fw-bold text-dark">@item.Product.Name</span>
+                                            } else {
+                                                <span class="text-muted fst-italic">Silinmiş Ürün</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-secondary rounded-pill">@item.Quantity</span>
+                                        </td>
+                                        <td class="text-end pe-4 fw-bold text-primary">
+                                            @if(item.Product != null) {
+                                                @((item.Product.Price * item.Quantity).ToString("C2"))
+                                            } else { <span>-</span> }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted">
+                                        <i class="bi bi-basket3 display-4 opacity-50"></i>
+                                        <p class="mt-2 mb-0">Henüz kayıtlı bir alışveriş yok.</p>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

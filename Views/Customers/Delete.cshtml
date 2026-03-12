@@ -1,0 +1,22 @@
+@model ButikStok.Models.Customer
+@{ ViewData["Title"] = "Müşteriyi Sil"; }
+
+<div class="container py-5 text-center">
+    <div class="card border-0 shadow-lg mx-auto rounded-4 overflow-hidden" style="max-width: 500px;">
+        <div class="card-header bg-danger text-white py-4">
+            <i class="bi bi-exclamation-triangle-fill display-1"></i>
+            <h3 class="mt-3 fw-bold">Müşteriyi Sil?</h3>
+        </div>
+        <div class="card-body p-4">
+            <p class="lead mb-4">
+                <strong>@Model.Name</strong> isimli müşteriyi silmek üzeresin.<br>
+                <span class="text-danger small">Bu işlem geri alınamaz ve tüm geçmişi silinir!</span>
+            </p>
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-danger btn-lg w-100 mb-2 fw-bold shadow-sm">EVET, SİL GİTSİN</button>
+                <a asp-action="Index" class="btn btn-light w-100 text-muted">Vazgeç</a>
+            </form>
+        </div>
+    </div>
+</div>

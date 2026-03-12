@@ -1,0 +1,50 @@
+@{
+    Layout = null; // Menüleri gizle, sadece giriş kutusu olsun
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giriş Yap - ButikStok</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body { background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .login-card { width: 100%; max-width: 400px; border-radius: 15px; overflow: hidden; }
+        .login-header { background: #0d6efd; padding: 30px; text-align: center; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="card login-card shadow-lg border-0">
+        <div class="login-header">
+            <h3><i class="bi bi-shop"></i> ButikStok</h3>
+            <p class="mb-0 text-white-50">Yönetim Paneli Girişi</p>
+        </div>
+        <div class="card-body p-4 bg-white">
+            
+            @if (ViewBag.Hata != null)
+            {
+                <div class="alert alert-danger text-center">@ViewBag.Hata</div>
+            }
+
+            <form method="post">
+                <div class="mb-3">
+                    <label class="form-label text-muted">Kullanıcı Adı</label>
+                    <input type="text" name="kadi" class="form-control form-control-lg" required autofocus />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted">Şifre</label>
+                    <input type="password" name="sifre" class="form-control form-control-lg" required />
+                </div>
+                <button type="submit" class="btn btn-primary w-100 btn-lg mt-3">GİRİŞ YAP</button>
+            </form>
+        </div>
+        <div class="card-footer text-center bg-light py-3">
+            <small class="text-muted">Güvenli Yönetim Sistemi v1.0</small>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+@model ButikStok.Models.Product
+
+@{
+    ViewData["Title"] = "Yeni Ürün Ekle";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-magic me-2"></i>Yeni Ürün Tanımla</h5>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <form asp-action="Create" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 text-center mb-4 mb-md-0">
+                                <label class="form-label fw-bold text-muted">Ürün Görseli</label>
+                                <div class="position-relative">
+                                    <div class="border-2 border-dashed rounded-3 p-1 bg-light d-flex align-items-center justify-content-center" 
+                                         style="height: 200px; border-style: dashed; border-color: #cbd5e1;">
+                                        <img id="imgPreview" src="#" alt="Önizleme" class="img-fluid rounded-2 d-none" style="max-height: 190px;" />
+                                        <div id="uploadPlaceholder" class="text-center text-muted">
+                                            <i class="bi bi-cloud-arrow-up display-4"></i>
+                                            <p class="small mt-2 mb-0">Fotoğraf Seç</p>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="imageFile" id="imageInput" class="form-control mt-2" accept="image/*" onchange="previewImage(this)" />
+                                </div>
+                                <small class="text-muted d-block mt-2 fst-italic">Kare (1:1) önerilir.</small>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Name" class="form-control" placeholder="Ürün Adı" />
+                                    <label asp-for="Name">Ürün Adı (Örn: Mavi Jean)</label>
+                                    <span asp-validation-for="Name" class="text-danger small"></span>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Barcode" class="form-control" placeholder="Barkod" />
+                                    <label asp-for="Barcode">Barkod (Okutun veya yazın)</label>
+                                    <span asp-validation-for="Barcode" class="text-danger small"></span>
+                                </div>
+
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input asp-for="Price" class="form-control" type="number" step="0.01" placeholder="Fiyat" />
+                                            <label asp-for="Price">Satış Fiyatı (₺)</label>
+                                        </div>
+                                        <span asp-validation-for="Price" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input asp-for="StockQuantity" class="form-control" type="number" placeholder="Stok" />
+                                            <label asp-for="StockQuantity">Stok Adedi</label>
+                                        </div>
+                                        <span asp-validation-for="StockQuantity" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-floating mb-4">
+                                    <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId"></select>
+                                    <label asp-for="CategoryId">Kategori Seçin</label>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                        <i class="bi bi-check-circle-fill me-2"></i>KAYDET VE BİTİR
+                                    </button>
+                                    <a asp-action="Index" class="btn btn-outline-secondary border-0">Vazgeç</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('imgPreview').src = e.target.result;
+                document.getElementById('imgPreview').classList.remove('d-none');
+                document.getElementById('uploadPlaceholder').classList.add('d-none');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

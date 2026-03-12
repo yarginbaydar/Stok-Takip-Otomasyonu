@@ -1,0 +1,265 @@
+@model IEnumerable<ButikStok.Models.Product>
+
+@{
+    ViewData["Title"] = "Ürün Listesi";
+}
+
+<div class="container py-4">
+    
+    @if (TempData["Mesaj"] != null)
+    {
+        <div class="alert alert-@TempData["Durum"] alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                <div>@TempData["Mesaj"]</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-3 align-items-center mb-4">
+        <div class="col-md-6">
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="bi bi-box-seam text-primary"></i> Ürün Portföyü
+            </h2>
+            <p class="text-muted small mb-0">Toplam @Model.Count() çeşit ürün listeleniyor.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <div class="btn-group shadow-sm">
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i> Yeni Ürün
+                </a>
+                <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#importModal">
+                    <i class="bi bi-file-earmark-arrow-up"></i> Excel Yükle
+                </button>
+                <a asp-action="ExportToExcel" class="btn btn-success">
+                    <i class="bi bi-file-earmark-excel"></i> Excel İndir
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
+        <div class="card-body p-2 bg-white">
+            <form asp-action="Index" method="get" class="row g-2 align-items-center px-2">
+                <div class="col-auto">
+                    <i class="bi bi-search text-primary fs-5"></i>
+                </div>
+                <div class="col">
+                    <input type="text" name="aramaTerimi" 
+                           value="@ViewData["MevcutFiltre"]" 
+                           class="form-control border-0 shadow-none" 
+                           placeholder="Ürün adı, barkod veya kategori ara..." />
+                </div>
+                <div class="col-auto">
+                    @if (ViewData["MevcutFiltre"] != null)
+                    {
+                        <a asp-action="Index" class="btn btn-light text-danger btn-sm rounded-pill px-3">
+                            <i class="bi bi-x-circle"></i> Temizle
+                        </a>
+                    }
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">Ara</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th class="py-3 ps-4">ÜRÜN BİLGİSİ</th>
+                        <th>BARKOD</th> 
+                        <th>FİYAT</th>
+                        <th style="width: 25%;">STOK DURUMU</th>
+                        <th>KATEGORİ</th>
+                        <th class="text-end pe-4">İŞLEMLER</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model) {
+                    var satisModalId = "satisModal_" + item.Id;
+                    var ekleModalId = "ekleModal_" + item.Id;
+                    int hedefStok = 20; 
+                    int yuzde = (item.StockQuantity * 100) / hedefStok;
+                    if (yuzde > 100) yuzde = 100;
+
+                    string barRenk = (item.StockQuantity <= 5) ? "bg-danger" : (item.StockQuantity <= 10) ? "bg-warning" : "bg-success";
+                    
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="position-relative me-3">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@Url.Content("~/images/products/" + item.ImageUrl)" 
+                                             class="rounded-3 border shadow-sm" 
+                                             style="width: 50px; height: 50px; object-fit: cover;" 
+                                             onerror="this.src='https://placehold.co/50x50?text=Yok'"/>
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-light rounded-3 border d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px;">
+                                            <i class="bi bi-camera text-muted"></i>
+                                        </div>
+                                    }
+                                    @if(item.StockQuantity == 0) {
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">!</span>
+                                    }
+                                </div>
+                                <div>
+                                    <span class="fw-bold text-dark d-block">@item.Name</span>
+                                    <small class="text-muted">@item.Description</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="font-monospace text-secondary">@(item.Barcode ?? "-")</td>
+                        <td class="fw-bold text-primary">@item.Price.ToString("C2")</td>
+                        <td>
+                            <div class="d-flex justify-content-between mb-1 small">
+                                <span>Adet: <strong>@item.StockQuantity</strong></span>
+                                @if(item.StockQuantity <= 5) { <span class="text-danger fw-bold blinking">AZ KALDI!</span> }
+                            </div>
+                            <div class="progress shadow-sm" style="height: 6px; background-color: #e9ecef;">
+                                <div class="progress-bar @barRenk" role="progressbar" style="width: @yuzde%"></div>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-secondary border">@(item.Category?.Name ?? "Genel")</span></td>
+                        <td class="text-end pe-4">
+                            <div class="btn-group shadow-sm">
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#@ekleModalId" title="Stok Ekle">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                                
+                                <button class="btn btn-sm btn-success text-white @(item.StockQuantity == 0 ? "disabled" : "")" 
+                                        data-bs-toggle="modal" data-bs-target="#@satisModalId" title="Hızlı Satış">
+                                    <i class="bi bi-currency-dollar"></i>
+                                </button>
+                                
+                                <a asp-action="Label" asp-route-id="@item.Id" target="_blank" class="btn btn-sm btn-warning text-dark" title="Etiket Yazdır">
+                                    <i class="bi bi-printer-fill"></i>
+                                </a>
+
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary" title="Düzenle">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-dark" title="Barkod/Detay">
+                                    <i class="bi bi-qr-code"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Sil">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <div class="modal fade" id="@satisModalId" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-sm">
+                            <div class="modal-content border-0 shadow">
+                                <div class="modal-header bg-success text-white">
+                                    <h6 class="modal-title fw-bold">Satış Yap</h6>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form asp-action="SatisYap" method="post">
+                                    <div class="modal-body text-center p-4">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <h5 class="fw-bold mb-3 text-truncate">@item.Name</h5>
+                                        
+                                        <div class="mb-3 text-start">
+                                            <label class="form-label small fw-bold text-muted">Müşteri Seç</label>
+                                            <select name="CustomerId" class="form-select form-select-sm" asp-items="ViewBag.Musteriler">
+                                                <option value="">-- Peşin / Anonim --</option>
+                                            </select>
+                                        </div>
+
+                                        <p class="text-muted small mb-2">Kaç adet satıldı?</p>
+                                        <div class="input-group mb-3">
+                                            <button type="button" class="btn btn-outline-secondary" onclick="this.parentNode.querySelector('input[type=number]').stepDown()">-</button>
+                                            <input type="number" name="adet" class="form-control text-center fw-bold fs-4" value="1" min="1" max="@item.StockQuantity" required />
+                                            <button type="button" class="btn btn-outline-secondary" onclick="this.parentNode.querySelector('input[type=number]').stepUp()">+</button>
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100 fw-bold">SATIŞI ONAYLA</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="@ekleModalId" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-sm">
+                            <div class="modal-content border-0 shadow">
+                                <div class="modal-header bg-primary text-white">
+                                    <h6 class="modal-title fw-bold">Stok Ekle</h6>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form asp-action="StokEkle" method="post">
+                                    <div class="modal-body text-center p-4">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <h5 class="fw-bold mb-3 text-truncate">@item.Name</h5>
+                                        <p class="text-muted small mb-3">Depoya kaç adet geldi?</p>
+                                        <input type="number" name="adet" class="form-control text-center fw-bold fs-4 mb-3" value="10" min="1" required />
+                                        <button type="submit" class="btn btn-primary w-100 fw-bold">STOĞA EKLE</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+                </tbody>
+            </table>
+            
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-box-seam text-muted display-1"></i>
+                    <p class="text-muted mt-3">Henüz hiç ürün eklenmemiş.</p>
+                    <a asp-action="Create" class="btn btn-outline-primary rounded-pill">İlk Ürünü Ekle</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title fw-bold"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Excel'den Yükle</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="ImportFromExcel" method="post" enctype="multipart/form-data">
+                <div class="modal-body p-4">
+                    <div class="alert alert-light border small mb-3">
+                        <strong><i class="bi bi-lightbulb-fill text-warning"></i> İpucu:</strong>
+                        Excel dosyanızın sütun sırası şöyle olmalı:<br>
+                        <code>Barkod | Ürün Adı | Fiyat | Stok</code>
+                    </div>
+                    <label class="form-label fw-bold">Dosya Seçin</label>
+                    <input type="file" name="excelFile" class="form-control" accept=".xlsx, .xls" required />
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-link text-muted text-decoration-none" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-dark fw-bold px-4 rounded-pill">Yüklemeyi Başlat</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Yanıp sönen uyarı efekti */
+    .blinking { 
+        animation: blinker 1.5s linear infinite; 
+    }
+    @@keyframes blinker { 
+        50% { opacity: 0.1; } 
+    }
+    
+    /* Tablo satırına gelince hafif vurgu */
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.02);
+        transition: background-color 0.2s;
+    }
+</style>
